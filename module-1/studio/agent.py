@@ -1,10 +1,20 @@
 from langchain_core.messages import SystemMessage
-from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI
 
 from langgraph.graph import START, StateGraph, MessagesState
 from langgraph.prebuilt import tools_condition, ToolNode
 
-def add(a: int, b: int) -> int:
+def multiply(a: float, b: float) -> int:
+    """Multiply a and b.
+
+    Args:
+        a: first int
+        b: second int
+    """
+    return a * b
+
+# This will be a tool
+def add(a: float, b: float) -> int:
     """Adds a and b.
 
     Args:
@@ -13,16 +23,7 @@ def add(a: int, b: int) -> int:
     """
     return a + b
 
-def multiply(a: int, b: int) -> int:
-    """Multiplies a and b.
-
-    Args:
-        a: first int
-        b: second int
-    """
-    return a * b
-
-def divide(a: int, b: int) -> float:
+def divide(a: float, b: float) -> float:
     """Divide a and b.
 
     Args:
@@ -34,11 +35,11 @@ def divide(a: int, b: int) -> float:
 tools = [add, multiply, divide]
 
 # Define LLM with bound tools
-llm = ChatOpenAI(model="gpt-4o")
+llm = AzureChatOpenAI(model="gpt-4o-mini")
 llm_with_tools = llm.bind_tools(tools)
 
 # System message
-sys_msg = SystemMessage(content="You are a helpful assistant tasked with writing performing arithmetic on a set of inputs.")
+sys_msg = SystemMessage(content="You are a helpful assistant tasked with performing arithmetic on a set of inputs. In the final answer you must explain how you solver the exercise")
 
 # Node
 def assistant(state: MessagesState):
